@@ -1,0 +1,21 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @person.name
+%p
+  %b Slack:
+  = @person.slack_id
+%p
+  %b Slack handle:
+  = @person.slack_handle
+%p
+  %b Available:
+  = @person.available
+%p
+  %b Product:
+  = @person.product
+
+= link_to 'Edit', edit_person_path(@person)
+\|
+= link_to 'Back', people_path
