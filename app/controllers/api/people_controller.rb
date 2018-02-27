@@ -27,25 +27,18 @@ class Api::PeopleController < ApplicationApiController
   end
 
   def here
-    message = MySlack::Message.new
+    unless params[:text].blank?
 
-    @product = Product.where("name ilike ?", "%#{params[:text]}%").first
+    end
 
-    @person.update_attributes(available: true, product: @product)
-
-    message.text = "Welcome back!"
-    message.add_attachment("It looks like you're set to work on *#{@person.working_on}* tickets")
-
-    render json: message
+    render json: MySlack::Status.set_here(params[:user_id], params[:text])
   end
 
   def away
-    message = MySlack::Status.set_away(params[:user_id])
-    render json: message
+    render json: MySlack::Status.set_away(params[:user_id])
   end
 
   private
-    # {"token"=>"a1B2c3D4e5F6", "team_id"=>"T8XEWREKD", "team_domain"=>"teknofire", "channel_id"=>"C8XEWRKMZ", "channel_name"=>"general", "user_id"=>"U8WU40EBA", "user_name"=>"will", "command"=>"/support-register", "text"=>""
     def register_slack_params
       {
         slack_id: params[:user_id],

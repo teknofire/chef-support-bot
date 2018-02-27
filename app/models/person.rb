@@ -16,10 +16,19 @@ class Person < ApplicationRecord
   end
 
   def working_on
+    reload
     self.product.nil? ? "any" : self.product.name
   end
 
   def set_away
     self.update_attribute(:available, false)
+  end
+
+  def set_here(product = nil)
+    Rails.logger.info product.inspect
+    self.product = product
+    self.available = true
+
+    self.save
   end
 end

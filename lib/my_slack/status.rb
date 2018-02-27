@@ -35,6 +35,37 @@ module MySlack
         message.text = "Bye! Come back soon!"
       else
         message.text = "Error trying to set you away"
+        message.add_attachment(person.errors.full_messages, MySlack::ERROR)
+      end
+
+      message
+    end
+
+    def self.set_here(slack_id, product_name = nil)
+      person = Person.where(slack_id: slack_id).first
+
+      unless product_name.blank?
+        product = Product.where(name: product_name).first
+
+        # didn't find it with an exact match so search for something like it
+        # TODO: need to handle what we do if we don't find anything
+        product ||= Product.where("name ilike ?", "%#{product_name}%").first
+      end
+
+      message = Message.new(text: 'Welcome back!')
+
+      if person.set_here(product)
+        message.push_attachment({
+          fields: [{
+            title: 'Working on',
+            short: true,
+            value: person.working_on
+          }],
+          color: MySlack::SUCCESS
+        })
+      else
+        message.text = "Error trying to set you away"
+        message.add_attachment(person.errors.full_messages, MySlack::ERROR)
       end
 
       message
