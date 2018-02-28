@@ -9,7 +9,12 @@ module MySlack
       status: {
         match: %w{ status available },
         command: 'status',
-        description: 'Print the current support staff status'
+        description: 'Print the list of available support ninjas'
+      },
+      register: {
+        match: %w{ register },
+        command: 'register',
+        description: 'Register as a support ninja'
       },
       away: {
         match: %w{ away gone },
@@ -80,20 +85,24 @@ module MySlack
         message
       end
 
+      def register(text, data = {})
+        MySlack::People.register(data['user'])
+      end
+
       def products(text, data = {})
         MySlack::Products.handle(text)
       end
 
       def status(text, data = {})
-        MySlack::Status.list()
+        MySlack::People.list()
       end
 
       def away(text, data = {})
-        MySlack::Status.set_away(data['user'])
+        MySlack::People.set_away(data['user'])
       end
 
       def here(text, data = {})
-        MySlack::Status.set_here(data['user'], text)
+        MySlack::People.set_here(data['user'], text)
       end
     end
   end

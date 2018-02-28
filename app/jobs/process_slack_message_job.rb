@@ -17,16 +17,7 @@ class ProcessSlackMessageJob < ApplicationJob
 
     message = MySlack::Commands.process(keyword, text, mention)
 
-    slack_client.chat_postMessage(message)
-  end
-
-  def slack_client
-    unless @client
-      @client = Slack::Web::Client.new
-      @client.auth_test
-    end
-
-    @client
+    MySlack::client.chat_postMessage(message)
   end
 
   def message_keyword(text)

@@ -13,13 +13,14 @@ class Api::SlackController < ApplicationApiController
   # processed by something else
   def events
     # ignore messages from bots!
-    return unless event_params[:bot_id].nil?
 
     case params[:type]
     when 'url_verification'
       logger.info "verifying url"
       render json: { challenge: params[:challenge] }
     when 'event_callback'
+      return unless event_params[:bot_id].nil?
+      
       render json: nil
       ProcessSlackMessageJob.perform_later(event_params.as_json)
     else
