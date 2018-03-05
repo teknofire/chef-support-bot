@@ -49,7 +49,7 @@ module MySlack
 
         slack_info = MySlack::client.users_info(user: slack_id)
         if slack_info.ok
-          @person = Person.new({ slack_id: slack_id, slack_handle: slack_info.user.name })
+          @person = Person.new({ slack_id: slack_id, slack_handle: slack_info.user.name, available: true })
           if @person.save
             message.text = "You have been registered"
           else
