@@ -15,9 +15,9 @@ class ProcessSlackMessageJob < ApplicationJob
     msg = Slack::Messages::Formatting.unescape(mention['text'])
     keyword, text = message_keyword(msg)
 
-    message = MySlack::Commands.process(keyword, text, mention)
+    message = ::MySlack::Commands.process(keyword, text, mention)
 
-    MySlack::client.chat_postMessage(message)
+    ::MySlack::client.chat_postMessage(message)
   end
 
   def message_keyword(text)
