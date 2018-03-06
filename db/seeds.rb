@@ -5,3 +5,9 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+products = %w{ chef-server chef-client chef-dk chef-ha automate analytics compliance habitat inspec manage reporting supermarket }
+
+products.each do |product|
+  Product.create(name: product)
+end
