@@ -4,15 +4,20 @@ require 'action_view/helpers'
 class Person < ApplicationRecord
   include ActionView::Helpers::DateHelper
   belongs_to :product, optional: true
+  has_many :tickets
 
   validates :slack_id, uniqueness: { message: "id already registered" }
 
   def status(all = false)
     if available?
-      "<@#{slack_id}> is *available* and working on *#{working_on}* tickets"
+      "#{user_mention} is *available* and working on *#{working_on}* tickets"
     elsif all
-      "<@#{slack_id}> was marked *away* #{time_ago_in_words(self.updated_at)} ago"
+      "#{user_mention} was marked *away* #{time_ago_in_words(self.updated_at)} ago"
     end
+  end
+
+  def user_mention
+    "<@#{slack_id}>"
   end
 
   def working_on

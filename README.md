@@ -17,11 +17,12 @@ rails db:create db:migrate db:seed
 
 Next, you will need to do is setup a new slack app to talk with your running instance.  You can do that by going to this page: https://api.slack.com/apps?new_app=1
 
+Go to the `Bot Users` and create a new user for the app, then you can go to the `OAuth & Permissions` and click the `Install App to Workspace` button.
+
 After that there are a couple of authentication tokens needed from slack that need to be added to a `.env` file in the root of the repository
-To get these you will need to setup a new slack app to talk with your running instance.  You can do that by going to this page: https://api.slack.com/apps?new_app=1
 
 * `SLACK_TOKEN` - This can be found in the `Basic Information` link and copying the `Verfication Token` value
-* `SLACK_API_TOKEN` - This can be found in the `Install App` link and copying the `Bot User OAuth Access Token`
+* `SLACK_API_TOKEN` - This can be found in the `OAuth & Permissions` link and copying the `Bot User OAuth Access Token`
 
 The contents of the file should look like this:
 

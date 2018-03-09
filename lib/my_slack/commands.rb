@@ -30,6 +30,11 @@ module MySlack
         match: %{ back here },
         command: 'here [product]',
         description: 'Mark youself as available, you can optionally provide a product that you are working on.'
+      },
+      tickets: {
+        match: %{ tickets ticket },
+        command: 'tickets [subcommand]',
+        description: 'Use `tickets help` for a list of subcommands'
       }
     }
 
@@ -63,6 +68,10 @@ module MySlack
 
     class << self
       private
+
+      def tickets(text, data = {})
+        MySlack::Tickets.handle(text)
+      end
 
       def not_implemented(text, data = {})
         message = MySlack::Message::new()

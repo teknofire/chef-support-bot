@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180223163636) do
+ActiveRecord::Schema.define(version: 20180309214102) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -32,5 +32,14 @@ ActiveRecord::Schema.define(version: 20180223163636) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "tickets", force: :cascade do |t|
+    t.string "zendesk_id"
+    t.bigint "person_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["person_id"], name: "index_tickets_on_person_id"
+  end
+
   add_foreign_key "people", "products"
+  add_foreign_key "tickets", "people"
 end
