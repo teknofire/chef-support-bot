@@ -89,6 +89,15 @@ module MySlack
         message
       end
 
+      def info(data)
+        ticket = Ticket.where(zendesk_id: data).first_or_initialize
+
+        message = MySlack::Message.new()
+        message.push_attachment(ticket.zendesk_summary)
+
+        message
+      end
+
       def assign(data)
         ticket_id, product_name = data.split(' ')
 
