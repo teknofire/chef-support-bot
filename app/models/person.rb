@@ -10,9 +10,9 @@ class Person < ApplicationRecord
 
   def status(all = false)
     if available?
-      "#{user_mention} is *available* and working on *#{working_on}* tickets"
+      "#{slack_handle} is *available* and working on *#{working_on}* tickets"
     elsif all
-      "#{user_mention} was marked *away* #{time_ago_in_words(self.updated_at)} ago"
+      "#{slack_handle} was marked *away* #{time_ago_in_words(self.updated_at)} ago"
     end
   end
 
