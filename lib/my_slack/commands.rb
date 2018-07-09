@@ -43,16 +43,50 @@ module MySlack
       }
     }
 
-    def self.process(name, text, data)
-      cmd = _find_command(name);
+    PLUGINS = [
+      proc { |text,data| MySlack::Commands::bot_commands(text, data) },
+      proc { |text,data| MySlack::Commands::watch_words(text, data) }
+    ]
 
-      Rails.logger.info "Running command: #{cmd}"
+    def self.watch_words(text, data)
+      message = nil
+      matched = text.match(/ZD[-]{0,1}([\d]+)/)
+      if matched
+        message = MySlack::Tickets::info(matched[1])
+      end
+
+      message
+    end
+
+    def self.command_for_me?(text, data)
+      first_word = text.split(/\s+/).first
+
+      data['type'] == 'app_mention' && first_word.match?(/@#{MySlack.user_id}/)
+    end
+
+    def self.bot_commands(text, data)
+      return unless command_for_me?(text, data)
+
+      keyword = _keyword(text)
+      cmd = _find_command(keyword);
+
+      Rails.logger.info "Running command: #{cmd}, #{data}"
       message = self.send(cmd, text, data)
+    end
 
-      message = message.as_json
-      message[:channel] ||= data['channel']
-      message[:as_user] = true
+    def self.process(text, data)
+      message = nil
+      PLUGINS.each do |plugin|
+        response = plugin.call(text, data)
 
+        unless response.nil?
+          message = response.as_json
+          message[:channel] ||= data['channel']
+          message[:as_user] = true
+          break
+        end
+
+      end
       message
     end
 
@@ -68,17 +102,35 @@ module MySlack
       end
 
       # return a message if we don't know
-      'not_implemented'
+      'unknown'
+    end
+
+    def self.mention?(text)
+
+    end
+
+    def self._keyword(text)
+      words = text.split(/\s+/)
+      # remove bot mention
+      if words.first =~ /@[\w]+/
+        words.shift
+      end
+      words.shift
     end
 
     class << self
       private
 
+      def identity
+      end
+
       def tickets(text, data = {})
         MySlack::Tickets.handle(text)
       end
 
-      def not_implemented(text, data = {})
+      def unknown(text, data = {})
+        return unless Rails.env.development?
+
         message = MySlack::Message::new()
         message.push_attachment({
           title: "I'm sorry <@#{data['user']}>, I'm afraid I can't do that",
