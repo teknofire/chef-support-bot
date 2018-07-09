@@ -61,7 +61,7 @@ module MySlack
     def self.command_for_me?(text, data)
       first_word = text.split(/\s+/).first
 
-      data['type'] == 'app_mention' && first_word.match?(/@#{MySlack.user_id}/)
+      data['channel_type'] == 'im' || (data['type'] == 'app_mention' && first_word.match?(/@#{MySlack.user_id}/))
     end
 
     def self.bot_commands(text, data)
@@ -103,10 +103,6 @@ module MySlack
 
       # return a message if we don't know
       'unknown'
-    end
-
-    def self.mention?(text)
-
     end
 
     def self._keyword(text)
