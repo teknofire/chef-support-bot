@@ -12,20 +12,13 @@ class ProcessSlackMessageJob < ApplicationJob
   end
 
   def process_app_mention(mention)
+    logger.info mention.inspect
     msg = Slack::Messages::Formatting.unescape(mention['text'])
-    keyword, text = message_keyword(msg)
+    # keyword, text = message_keyword(msg)
 
-    message = ::MySlack::Commands.process(keyword, text, mention)
+    message = ::MySlack::Commands.process(msg, mention)
 
-    ::MySlack::client.chat_postMessage(message)
-  end
-
-  def message_keyword(text)
-    words = text.split(' ')
-    if words.first =~ /@[\w]+/
-      words.shift
-    end
-    [words.shift, words.join(' ')]
+    ::MySlack::client.chat_postMessage(message) unless message.nil?
   end
 
   def bot_match(word)

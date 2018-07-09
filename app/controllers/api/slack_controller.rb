@@ -20,7 +20,7 @@ class Api::SlackController < ApplicationApiController
       render json: { challenge: params[:challenge] }
     when 'event_callback'
       return unless event_params[:bot_id].nil?
-      
+
       render json: nil
       ProcessSlackMessageJob.perform_later(event_params.as_json)
     else
@@ -33,6 +33,6 @@ class Api::SlackController < ApplicationApiController
   private
 
   def event_params
-    params.require(:event).permit(:type, :text, :channel, :authed_users, :user, :ts, :event_ts, :bot_id, attachments: [])
+    params.require(:event).permit(:type, :text, :channel, :authed_users, :user, :ts, :event_ts, :bot_id, :client_msg_id, :channel_type, attachments: [])
   end
 end
