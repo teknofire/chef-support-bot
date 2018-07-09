@@ -42,7 +42,7 @@ ngrok http 3000
 Once the application is running you will then need to setup slack to be able to talk to it.  
 1. Take the ngrok url generated above and go to the `Event Subscriptions` page in the slack app setup.  
 2. Add the following to the `Request URL` - `https://NGROK_HOST_PORT/api/events`
-2. Then you will need to subscribe the following "Bot Events"
+3. Then you will need to subscribe the following "Bot Events"
   * `app_mention`
   * `message.im`
   * `message.channels`
