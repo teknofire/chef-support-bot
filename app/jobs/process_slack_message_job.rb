@@ -16,7 +16,6 @@ class ProcessSlackMessageJob < ApplicationJob
   def process_app_mention(mention)
     logger.info mention.inspect
     msg = Slack::Messages::Formatting.unescape(mention['text'])
-    # keyword, text = message_keyword(msg)
 
     message = ::MySlack::Commands.process(msg, mention)
     ::MySlack::client.chat_postMessage(message) unless message.nil?

@@ -121,16 +121,11 @@ module MySlack
     class << self
       private
 
-      def identity
-      end
-
       def tickets(text, data = {})
         MySlack::Tickets.handle(text)
       end
 
       def unknown(text, data = {})
-        return unless Rails.env.development?
-
         message = MySlack::Message::new()
         message.push_attachment({
           title: "I'm sorry <@#{data['user']}>, I'm afraid I can't do that",
