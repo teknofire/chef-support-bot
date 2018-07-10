@@ -29,6 +29,10 @@ class Person < ApplicationRecord
     self.update_attribute(:available, false)
   end
 
+  def update_email(email = nil)
+    self.update_attribute(:slack_email, email)
+  end
+
   def set_here(product = nil)
     Rails.logger.info product.inspect
     self.product = product

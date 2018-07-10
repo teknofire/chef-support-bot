@@ -26,10 +26,15 @@ class Api::PeopleController < ApplicationApiController
     render json: MySlack::People.set_away(params[:user_id])
   end
 
+  def update_email
+    render json: MySlack::People.update_email(params[:user_id],params[:text])
+  end
+
   private
     def register_slack_params
       {
         slack_id: params[:user_id],
+        slack_email: params[:user_email],
         slack_handle: params[:user_name],
         available: true
       }

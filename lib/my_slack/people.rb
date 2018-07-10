@@ -44,14 +44,30 @@ module MySlack
         message
       end
 
+      def update_email(slack_id,email)
+        person = Person.where(slack_id: slack_id).first
+        return user_not_found if person.nil?
+
+        message = MySlack::Message.new()
+
+        if person.update_email(email)
+          message.text = "Email successfully updated to: #{person.slack_email}"
+        else
+          message.text = "Error trying to update email"
+          message.add_attachment(person.errors.full_messages, MySlack::ERROR)
+        end
+
+        message
+      end
+
       def register(slack_id)
         message = MySlack::Message.new()
 
         slack_info = MySlack::client.users_info(user: slack_id)
         if slack_info.ok
-          @person = Person.new({ slack_id: slack_id, slack_handle: slack_info.user.name, available: true })
+          @person = Person.new({ slack_id: slack_id, slack_handle: slack_info.user.name, slack_email: slack_info.user.profile.email, available: true })
           if @person.save
-            message.text = "You have been registered"
+            message.text = "<@#{slack_id}>, you have been registered with #{slack_info.user.profile.email}.  If this is different than your Zendesk Agent email, please run the command `update_email <YOUR_ZENDESK_EMAIL>` to correct it."
           else
             message.text = "There was an error registering your account"
             message.add_attachment(@person.errors.full_messages.join("\n"), MySlack::ERROR)
