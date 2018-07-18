@@ -85,7 +85,6 @@ module MySlack
           message[:as_user] = true
           break
         end
-
       end
       message
     end
