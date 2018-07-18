@@ -5,7 +5,7 @@ class ProcessSlackMessageJob < ApplicationJob
     # Do something later
     case event_params['type']
     when 'app_mention', 'message'
-      if !event_params['text'].nil? 
+      if !event_params['text'].nil?
         process_app_mention(event_params)
       end
     else
@@ -14,26 +14,10 @@ class ProcessSlackMessageJob < ApplicationJob
   end
 
   def process_app_mention(mention)
+    logger.info mention.inspect
     msg = Slack::Messages::Formatting.unescape(mention['text'])
-    keyword, text = message_keyword(msg)
 
-    message = ::MySlack::Commands.process(keyword, text, mention)
-    logger.info "RESPOOOOOOONSE #{message.inspect}"
-    ::MySlack::client.chat_postMessage(message)
-  end
-
-  def message_keyword(text)
-    words = text.split(' ')
-    if words.first =~ /@[\w]+/
-      words.shift
-    end
-    [words.shift, words.join(' ')]
-  end
-
-  def bot_match(word)
-    /@(\w+) #{word}/
-  end
-
-  def find_person(id)
+    message = ::MySlack::Commands.process(msg, mention)
+    ::MySlack::client.chat_postMessage(message) unless message.nil?
   end
 end
