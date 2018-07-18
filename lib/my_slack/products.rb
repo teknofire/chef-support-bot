@@ -14,8 +14,6 @@ module MySlack
       def _parse_text(text)
         text.downcase!
         words = text.split(' ')
-        # strip off the products command word
-        words.shift
         [words.shift, words.join(' ')]
       end
 

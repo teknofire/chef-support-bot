@@ -29,9 +29,7 @@ module MySlack
 
       def _parse_text(text)
         text.downcase!
-        words = text.split(' ')
-        # strip off the main ticket keyword
-        words.shift
+        words = text.split(' ')  
         [words.shift, words.join(' ')]
       end
 

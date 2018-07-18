@@ -67,11 +67,11 @@ module MySlack
     def self.bot_commands(text, data)
       return unless command_for_me?(text, data)
 
-      keyword = _keyword(text)
+      keyword, message = _keyword(text)
       cmd = _find_command(keyword);
 
       Rails.logger.info "Running command: #{cmd}, #{data}"
-      message = self.send(cmd, text, data) unless cmd == 'unknown'
+      message = self.send(cmd, message, data) unless cmd == 'unknown'
     end
 
     def self.process(text, data)
@@ -110,7 +110,7 @@ module MySlack
       if words.first =~ /@[\w]+/
         words.shift
       end
-      words.shift
+      [words.shift, words.join(' ')]
     end
 
     class << self
