@@ -50,7 +50,7 @@ module MySlack
 
     def self.watch_words(text, data)
       message = nil
-      matched = text.match(/ZD[-]{0,1}([\d]+)/)
+      matched = text.match(/ZD[-]{0,1}([\d]+)/i)
       if matched
         message = MySlack::Tickets::info(matched[1])
       end
@@ -71,7 +71,7 @@ module MySlack
       cmd = _find_command(keyword);
 
       Rails.logger.info "Running command: #{cmd}, #{data}"
-      message = self.send(cmd, text, data)
+      message = self.send(cmd, text, data) unless cmd == 'unknown'
     end
 
     def self.process(text, data)
@@ -83,7 +83,7 @@ module MySlack
           message = response.as_json
           message[:channel] ||= data['channel']
           message[:as_user] = true
-          break
+          return message
         end
       end
       message
