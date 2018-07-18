@@ -1,6 +1,7 @@
 class Ticket < ApplicationRecord
   belongs_to :person, optional: true
   include ActionView::Helpers::DateHelper
+  include ActionView::Helpers::TextHelper
 
   validates :zendesk_id, uniqueness: { message: "ticket id has already been created"}
   # TODO:  validate that ticket exists in zendesk
@@ -8,7 +9,7 @@ class Ticket < ApplicationRecord
   def zendesk_agent_url
     "https://getchef.zendesk.com/agent/tickets/#{zendesk_id}"
   end
-  
+
   def zendesk_summary
     @zendeskinfo ||= ZendeskClient.instance.tickets.find!(id: zendesk_id,  :include => :users)
 
@@ -37,7 +38,7 @@ class Ticket < ApplicationRecord
         value: time_ago_in_words(@zendeskinfo.updated_at) + " ago"
       }, {
         title: 'Description',
-        value: @zendeskinfo.description
+        value: truncate(@zendeskinfo.description, length: 500, separator: ' ')
       }]
     }
   end

@@ -96,7 +96,7 @@ module MySlack
       def info(data)
         ticket = Ticket.where(zendesk_id: data).first_or_initialize
 
-        message = MySlack::Message.new(text: ticket.zendesk_agent_url)
+        message = MySlack::Message.new(text: ticket.zendesk_agent_url, unfurl_links: false)
         message.push_attachment(ticket.zendesk_summary)
 
         message
