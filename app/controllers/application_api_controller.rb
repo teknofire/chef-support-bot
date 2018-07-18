@@ -4,7 +4,13 @@ class ApplicationApiController < ActionController::Base
   private
 
   def validate_token
-    if params[:token] != Rails.application.secrets.slack_token
+    # handle "payload" format
+    if !params[:payload].nil?
+      newparams = JSON.parse(params[:payload], :symbolize_names => true)
+    else
+      newparams = params
+    end  
+    if newparams[:token] != Rails.application.secrets.slack_token
       redirect_to api_invalid_token_url
     end
   end

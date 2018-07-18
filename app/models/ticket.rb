@@ -3,23 +3,28 @@ class Ticket < ApplicationRecord
   include ActionView::Helpers::DateHelper
 
   validates :zendesk_id, uniqueness: { message: "ticket id has already been created"}
+  # TODO:  validate that ticket exists in zendesk
 
   def zendesk_agent_url
     "https://getchef.zendesk.com/agent/tickets/#{zendesk_id}"
   end
-
+  
   def zendesk_summary
-    @zendeskinfo ||= ZendeskClient.instance.ticket.find!(id: zendesk_id)
+    @zendeskinfo ||= ZendeskClient.instance.tickets.find!(id: zendesk_id,  :include => :users)
 
     {
       title: @zendeskinfo.subject,
       title_link: zendesk_agent_url,
       fields: [{
-        title: 'Agent',
+        title: 'Assigned Agent',
         short: true,
-        value: person.nil? ? 'Unassigned' : person.slack_handle
+        value: "#{@zendeskinfo.assignee.name}"
+      },{
+        title: 'Pending Candidate',
+        short: true,
+        value: person.nil? ? 'None' : "<@#{person.slack_id}>"
       }, {
-        title: 'Status',
+        title: 'Ticket Status',
         short: true,
         value: @zendeskinfo.status
       }, {

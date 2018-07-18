@@ -4,6 +4,7 @@ one:
   name: MyString
   slack_id: MyString
   slack_handle: MyString
+  slack_email: MyString
   available: false
   product: one
 
@@ -11,5 +12,6 @@ two:
   name: MyString
   slack_id: MyString
   slack_handle: MyString
+  slack_email: MyString
   available: false
   product: two

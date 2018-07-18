@@ -21,6 +21,11 @@ module MySlack
         command: 'away',
         description: 'Mark yourself as away'
       },
+      update_email: {
+        match: %w{ update_email email },
+        command: 'update_email',
+        description: 'Update your associated Zendesk email'
+      },
       products: {
         match: %w{ products product },
         command: 'products [subcommand]',
@@ -108,6 +113,10 @@ module MySlack
 
       def away(text, data = {})
         MySlack::People.set_away(data['user'])
+      end
+
+      def update_email(text, data = {})
+        MySlack::People.update_email(data['user'], text)
       end
 
       def here(text, data = {})

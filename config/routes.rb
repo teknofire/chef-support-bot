@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     post :actions, controller: 'slack'
     get :invalid_token, controller: 'slack'
     post :events, controller: 'slack'
+    post :interactive, controller: 'slack'
     
     resources :people, only: [] do
       collection do

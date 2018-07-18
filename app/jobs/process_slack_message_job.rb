@@ -5,7 +5,9 @@ class ProcessSlackMessageJob < ApplicationJob
     # Do something later
     case event_params['type']
     when 'app_mention', 'message'
-      process_app_mention(event_params)
+      if !event_params['text'].nil? 
+        process_app_mention(event_params)
+      end
     else
       logger.info "We don't handle #{event_params['type']} yet"
     end
@@ -16,7 +18,7 @@ class ProcessSlackMessageJob < ApplicationJob
     keyword, text = message_keyword(msg)
 
     message = ::MySlack::Commands.process(keyword, text, mention)
-
+    logger.info "RESPOOOOOOONSE #{message.inspect}"
     ::MySlack::client.chat_postMessage(message)
   end
 

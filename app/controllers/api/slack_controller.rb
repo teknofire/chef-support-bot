@@ -9,6 +9,18 @@ class Api::SlackController < ApplicationApiController
     render json: nil, status: :unauthorized
   end
 
+  def interactive
+    payload = JSON.parse(params[:payload],:symbolize_names => true)
+    case payload[:type]
+    when 'interactive_message'
+      ProcessInteractiveMessageJob.perform_later(payload.as_json)
+    else
+      logger.info '*'*10
+      logger.info "Unknown interactive event type: #{payload[:type]}"
+      logger.info params.inspect
+    end  
+  end
+
   # Note that these should respond with a 200 quickly. Any real work needs to be
   # processed by something else
   def events
@@ -25,7 +37,7 @@ class Api::SlackController < ApplicationApiController
       ProcessSlackMessageJob.perform_later(event_params.as_json)
     else
       logger.info '*'*10
-      logger.info "Unknown event type: #{event_type}"
+      logger.info "Unknown event type: #{params[:type]}"
       logger.info params.inspect
     end
   end
@@ -35,4 +47,5 @@ class Api::SlackController < ApplicationApiController
   def event_params
     params.require(:event).permit(:type, :text, :channel, :authed_users, :user, :ts, :event_ts, :bot_id, attachments: [])
   end
+
 end
