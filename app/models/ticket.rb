@@ -19,7 +19,7 @@ class Ticket < ApplicationRecord
       fields: [{
         title: 'Assigned Agent',
         short: true,
-        value: "#{@zendeskinfo.assignee.name}"
+        value: "#{@zendeskinfo.assignee.try(:name) || 'None'}"
       },{
         title: 'Pending Candidate',
         short: true,
