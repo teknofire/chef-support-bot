@@ -45,6 +45,10 @@ Add the following to the `Request URL` - `https://NGROK_HOST_PORT/api/events`
 
 Then you will need to subscribe the bot to the `app_mention` and `message.im` events below that.
 
+Additionally, `Interactive Components` will need to be enabled, and on that page the `Request URL` will use the ngrok url with a different endpoint: `https://NGROK_HOST_PORT/api/interactive`
+
+
+
 ## How to run the test suite
 
 ```
