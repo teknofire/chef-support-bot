@@ -11,14 +11,14 @@ class Ticket < ApplicationRecord
   
   def zendesk_summary
     @zendeskinfo ||= ZendeskClient.instance.tickets.find!(id: zendesk_id,  :include => :users)
-
+    puts "ZENDESK INFO:   #{@zendeskinfo.inspect}"
     {
       title: @zendeskinfo.subject,
       title_link: zendesk_agent_url,
       fields: [{
         title: 'Assigned Agent',
         short: true,
-        value: "#{@zendeskinfo.assignee.name}"
+        value: @zendeskinfo.assignee.nil? ? 'None' : "#{@zendeskinfo.assignee.name}"
       },{
         title: 'Pending Candidate',
         short: true,
