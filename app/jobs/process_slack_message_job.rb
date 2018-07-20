@@ -1,7 +1,5 @@
 class ProcessSlackMessageJob < ApplicationJob
   queue_as :default
-  include SuckerPunch::Job
-  workers 20
 
   def perform(event_params)
     ActiveRecord::Base.connection_pool.with_connection do
@@ -19,9 +17,8 @@ class ProcessSlackMessageJob < ApplicationJob
 
   def process_app_mention(mention)
     msg = Slack::Messages::Formatting.unescape(mention['text'])
-    keyword, text = message_keyword(msg)
+    message = ::MySlack::Commands.process(msg, mention)
 
-    message = ::MySlack::Commands.process(keyword, text, mention)
     resultmess =  ::MySlack::client.chat_postMessage(message)
     result = resultmess['message']
     puts "OMGH     #{result.inspect}"
@@ -45,18 +42,5 @@ class ProcessSlackMessageJob < ApplicationJob
     
   end
 
-  def message_keyword(text)
-    words = text.split(' ')
-    if words.first =~ /@[\w]+/
-      words.shift
-    end
-    [words.shift, words.join(' ')]
-  end
 
-  def bot_match(word)
-    /@(\w+) #{word}/
-  end
-
-  def find_person(id)
-  end
 end

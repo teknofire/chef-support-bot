@@ -13,7 +13,7 @@ class Api::SlackController < ApplicationApiController
     payload = JSON.parse(params[:payload],:symbolize_names => true)
     case payload[:type]
     when 'interactive_message'
-      ProcessInteractiveMessageJob.perform_now(payload.as_json)
+      ProcessInteractiveMessageJob.perform_later(payload.as_json)
     else
       logger.info '*'*10
       logger.info "Unknown interactive event type: #{payload[:type]}"
@@ -34,7 +34,7 @@ class Api::SlackController < ApplicationApiController
       return unless event_params[:bot_id].nil?
       
       render json: nil
-      ProcessSlackMessageJob.perform_async(event_params.as_json)
+      ProcessSlackMessageJob.perform_later(event_params.as_json)
     else
       logger.info '*'*10
       logger.info "Unknown event type: #{params[:type]}"
