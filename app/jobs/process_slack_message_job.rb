@@ -6,7 +6,7 @@ class ProcessSlackMessageJob < ApplicationJob
     # Do something later
     case event_params['type']
     when 'app_mention', 'message'
-      if !event_params['text'].nil? 
+      if !event_params['text'].nil?
         process_app_mention(event_params)
       end
     else
@@ -16,11 +16,12 @@ class ProcessSlackMessageJob < ApplicationJob
   end
 
   def process_app_mention(mention)
+    logger.info mention.inspect
     msg = Slack::Messages::Formatting.unescape(mention['text'])
     message = ::MySlack::Commands.process(msg, mention)
 
-    resultmess =  ::MySlack::client.chat_postMessage(message)
-    result = resultmess['message']
+    resultmess = ::MySlack::client.chat_postMessage(message) unless message.nil?
+    result = resultmess.try(:message) || ''
     puts "OMGH     #{result.inspect}"
     if "#{result['text']}".include?("awaiting confirmation...")
       puts "SLEEEEEEP"
@@ -41,6 +42,8 @@ class ProcessSlackMessageJob < ApplicationJob
     end
     
   end
+
+
 
 
 end

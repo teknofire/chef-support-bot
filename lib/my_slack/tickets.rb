@@ -9,8 +9,10 @@ module MySlack
 
       def handle(text)
         keyword, data = _parse_text(text)
+        Rails.logger.info "Checking for keyword #{keyword}"
         if COMMANDS.include?(keyword)
           begin
+            Rails.logger.info "Running ticket command #{keyword}, #{data.inspect}"
             send(keyword, data)
           rescue => e
             message = help('Error running the specified command, showing help')
@@ -21,13 +23,13 @@ module MySlack
             message
           end
         else
-          help('Unknown command, here is what you can do with products')
+          help('Unknown command, here is what you can do with tickets')
         end
       end
 
       def _parse_text(text)
         text.downcase!
-        words = text.split(' ')
+        words = text.split(' ')  
         [words.shift, words.join(' ')]
       end
 
@@ -92,7 +94,7 @@ module MySlack
       def info(data)
         ticket = Ticket.where(zendesk_id: data).first_or_initialize
 
-        message = MySlack::Message.new()
+        message = MySlack::Message.new(text: ticket.zendesk_agent_url, unfurl_links: false)
         message.push_attachment(ticket.zendesk_summary)
 
         message
@@ -122,52 +124,52 @@ module MySlack
           create_assigned_ticket(ticket_id, person)
         end
       end
-      
+
       def confirm(ticket_id,user_id)
         # pull in person with user_id to access zendesk email
 	person = Person.where(slack_id: user_id).first
-	
+
         # update zendesk ticket with new assignee
 	ticket = Ticket.where(zendesk_id: ticket_id).first
 	puts "Ticket is:  #{ticket.inspect}"
-	
+
 	updated = zendesk_assign(ticket,person)
-	
+
         # update pending candidate field
         # create message with results and update slack
 
-	if updated
+	if updated 
 	   response = "and has confirmed! #{person.user_mention} is now assigned to #{ticket_id}"
 	   ticket.person = nil
+	   ticket.save
 	else
 	   response = "and tried to confirm, but something is fucked. :("
 	end
 
-        response 
+        response
       end
 
       def deny(ticket_id,user_id)
-	
+
         # update assignment to reflect denial
 	ticket = Ticket.where(zendesk_id: ticket_id).first
         ticket.person = nil
-	
+
 	if ticket.save
 	   response = "but can't accept!  Commencing automatic reassignment...?"
 	else
 	   response = "and tried to reject it, but something is fucked. :("
 	end
 
-        response 
+        response
       end
 
-  
+
       def zendesk_assign(ticket,person)
       	 current_try = "beginning zendesk_assign"
          begin
            current_try = "look up ticket #{ticket.zendesk_id}"	
            zdticket = ZendeskClient.instance.tickets.find!(id: ticket.zendesk_id,  :include => :users)	
-
 	   if zdticket.assignee.nil?
               puts "nil assignment"
       	   else 
@@ -180,9 +182,8 @@ module MySlack
            current_try = "assign ticket to found zendesk user #{ticket.zendesk_id}"	
       	   zdticket.assignee = zendeskuser
       	   zdticket.save!
-
 	   return true
-	
+
         rescue ZendeskAPI::Error::NetworkError, ZendeskAPI::Error::RecordNotFound => e
           puts "Something bad happened when trying to #{current_try}..."
           puts e.inspect
@@ -191,7 +192,7 @@ module MySlack
 
       end
 
-    
+
       def create_assigned_ticket(ticket_id, person)
         ticket = Ticket.where(zendesk_id: ticket_id).first_or_initialize
         ticket.person = person
