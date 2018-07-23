@@ -170,6 +170,7 @@ module MySlack
          begin
            current_try = "look up ticket #{ticket.zendesk_id}"	
            zdticket = ZendeskClient.instance.tickets.find!(id: ticket.zendesk_id,  :include => :users)	
+
 	   if zdticket.assignee.nil?
               puts "nil assignment"
       	   else 
@@ -182,6 +183,7 @@ module MySlack
            current_try = "assign ticket to found zendesk user #{ticket.zendesk_id}"	
       	   zdticket.assignee = zendeskuser
       	   zdticket.save!
+
 	   return true
 
         rescue ZendeskAPI::Error::NetworkError, ZendeskAPI::Error::RecordNotFound => e

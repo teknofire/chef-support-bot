@@ -35,7 +35,7 @@ class Api::SlackController < ApplicationApiController
 
       render json: nil
       ProcessSlackMessageJob.perform_later(event_params.as_json)
-      puts "PERFORMING LATERRZZZ"
+
     else
       logger.info '*'*10
       logger.info "Unknown event type: #{params[:type]}"

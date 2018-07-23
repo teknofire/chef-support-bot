@@ -22,7 +22,7 @@ class ProcessSlackMessageJob < ApplicationJob
 
     resultmess = ::MySlack::client.chat_postMessage(message) unless message.nil?
     result = resultmess.try(:message) || ''
-    puts "OMGH     #{result.inspect}"
+
     if "#{result['text']}".include?("awaiting confirmation...")
       puts "SLEEEEEEP"
       slack_id = result['text'][/<\@(.*?)>/m, 1]
@@ -42,8 +42,4 @@ class ProcessSlackMessageJob < ApplicationJob
     end
     
   end
-
-
-
-
 end
