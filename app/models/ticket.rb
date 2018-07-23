@@ -12,7 +12,7 @@ class Ticket < ApplicationRecord
 
   def zendesk_summary
     @zendeskinfo ||= ZendeskClient.instance.tickets.find!(id: zendesk_id,  :include => :users)
-
+    puts "ZENDESK INFO:   #{@zendeskinfo.inspect}"
     {
       title: @zendeskinfo.subject,
       title_link: zendesk_agent_url,

@@ -138,8 +138,10 @@ module MySlack
         # update pending candidate field
         # create message with results and update slack
 
-	if updated
+	if updated 
 	   response = "and has confirmed! #{person.user_mention} is now assigned to #{ticket_id}"
+	   ticket.person = nil
+	   ticket.save
 	else
 	   response = "and tried to confirm, but something is fucked. :("
 	end
@@ -166,21 +168,21 @@ module MySlack
       def zendesk_assign(ticket,person)
       	 current_try = "beginning zendesk_assign"
          begin
-           current_try = "look up ticket #{ticket.zendesk_id}"
-           @zendeskticket ||= ZendeskClient.instance.tickets.find!(id: ticket.zendesk_id,  :include => :users)
+           current_try = "look up ticket #{ticket.zendesk_id}"	
+           zdticket = ZendeskClient.instance.tickets.find!(id: ticket.zendesk_id,  :include => :users)	
 
-	   if @zendeskticket.assignee.nil?
+	   if zdticket.assignee.nil?
               puts "nil assignment"
-      	   else
-              current_assignee = @zendeskticket.assignee.name
+      	   else 
+              current_assignee = zdticket.assignee.name
       	   end
+	   
+           current_try = "look up zendesk user with person's email #{person.slack_email}"	
+      	   zendeskuser = ZendeskClient.instance.users.search(:query => "#{person.slack_email}").first
 
-           current_try = "look up zendesk user with person's email #{person.slack_email}"
-      	   @zendeskuser = ZendeskClient.instance.users.search(:query => "#{person.slack_email}").first
-
-           current_try = "assign ticket to found zendesk user #{ticket.zendesk_id}"
-      	   @zendeskticket.assignee = @zendeskuser
-      	   @zendeskticket.save!
+           current_try = "assign ticket to found zendesk user #{ticket.zendesk_id}"	
+      	   zdticket.assignee = zendeskuser
+      	   zdticket.save!
 
 	   return true
 
