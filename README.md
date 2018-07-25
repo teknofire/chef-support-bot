@@ -49,6 +49,10 @@ Once the application is running you will then need to setup slack to be able to 
 
 
 
+Additionally, `Interactive Components` will need to be enabled, and on that page the `Request URL` will use the ngrok url with a different endpoint: `https://NGROK_HOST_PORT/api/interactive`
+
+
+
 ## How to run the test suite
 
 ```

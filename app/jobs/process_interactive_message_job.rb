@@ -16,6 +16,7 @@ class ProcessInteractiveMessageJob < ApplicationJob
     result = "pending"
 
     # if we recieve a "Take" response from anyone, let them try and take the ticket
+    puts "----------------- #{params.inspect}"
     case params['actions'][0]['name']
     when 'take'
        result = ::MySlack::Tickets.confirm(params['actions'][0]['value'], params['user']['id'])
