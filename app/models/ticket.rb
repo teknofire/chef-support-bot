@@ -10,16 +10,19 @@ class Ticket < ApplicationRecord
     "https://getchef.zendesk.com/agent/tickets/#{zendesk_id}"
   end
 
+  def zd_info
+    @zd_info ||= ZendeskClient.instance.tickets.find!(id: zendesk_id,  :include => :users)
+  end
+
   def zendesk_summary
-    @zendeskinfo ||= ZendeskClient.instance.tickets.find!(id: zendesk_id,  :include => :users)
-    puts "ZENDESK INFO:   #{@zendeskinfo.inspect}"
+    puts "ZENDESK INFO: #{zd_info.inspect}"
     {
-      title: @zendeskinfo.subject,
+      title: zd_info.subject,
       title_link: zendesk_agent_url,
       fields: [{
         title: 'Assigned Agent',
         short: true,
-        value: "#{@zendeskinfo.assignee.try(:name) || 'None'}"
+        value: "#{zd_info.assignee.try(:send, :name) || 'None'}"
       },{
         title: 'Pending Candidate',
         short: true,
@@ -27,18 +30,18 @@ class Ticket < ApplicationRecord
       }, {
         title: 'Ticket Status',
         short: true,
-        value: @zendeskinfo.status
+        value: zd_info.status
       }, {
         title: 'Submitted',
         short: true,
-        value: time_ago_in_words(@zendeskinfo.created_at) + " ago"
+        value: time_ago_in_words(zd_info.created_at) + " ago"
       }, {
         title: 'Last updated',
         short: true,
-        value: time_ago_in_words(@zendeskinfo.updated_at) + " ago"
+        value: time_ago_in_words(zd_info.updated_at) + " ago"
       }, {
         title: 'Description',
-        value: truncate(@zendeskinfo.description, length: 500, separator: ' ')
+        value: truncate(zd_info.description, length: 500, separator: ' ')
       }]
     }
   end
